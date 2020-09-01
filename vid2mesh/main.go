@@ -18,11 +18,13 @@ func main() {
 	var mcDelta float64
 	var zStride int
 	var smoothIters int
+	var maxFrames int
 	flag.Float64Var(&delta, "delta", 0.04, "spatial quantization")
 	flag.Float64Var(&mcDelta, "mc-delta", 0,
 		"delta to use for maching cubes, if different than the spatial delta above")
 	flag.IntVar(&zStride, "z-stride", 1, "stride along Z axis (to reduce Z resolution)")
 	flag.IntVar(&smoothIters, "smooth", 20, "smoothing iterations to apply to each frame")
+	flag.IntVar(&maxFrames, "max-frames", 0, "maximum number of frames to read")
 	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, "Usage: vid2mesh [flags] <input.mp4> <output.stl>")
 		fmt.Fprintln(os.Stderr)
@@ -54,6 +56,9 @@ func main() {
 		essentials.Must(err)
 		log.Printf("Processing frame %d...", i+1)
 		deslicer.AddFrame(frame)
+		if maxFrames > 0 && i+1 >= maxFrames {
+			break
+		}
 	}
 
 	log.Println("Converting sliced solid to mesh ...")

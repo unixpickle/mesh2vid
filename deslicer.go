@@ -41,7 +41,7 @@ func (d *Deslicer) AddFrame(frame image.Image) {
 	}).Mesh().SmoothSq(d.smoothIters).Scale(d.delta)
 	sdf := model2d.MeshToSDF(mesh)
 	d.layers = append(d.layers, sdf)
-	d.max.Z = float64(len(d.layers)) * d.zDelta
+	d.max.Z = float64(len(d.layers)-1) * d.zDelta
 
 	min, max := mesh.Min(), mesh.Max()
 	d.max.X = math.Max(d.max.X, max.X)
@@ -65,7 +65,7 @@ func (d *Deslicer) Contains(c model3d.Coord3D) bool {
 		return false
 	}
 	z1 := int(c.Z / d.zDelta)
-	z2 := int(c.Z/d.zDelta + 1)
+	z2 := z1 + 1
 	s1 := d.getLayerSDF(z1, c)
 	s2 := d.getLayerSDF(z2, c)
 	fracInZ2 := (c.Z - float64(z1)*d.zDelta) / d.zDelta
